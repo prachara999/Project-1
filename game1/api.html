@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Fish Collector - API Challenge</title>
+
+<style>
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(180deg, #001b38, #005b83, #00304e);
+    color: white;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: hidden;
+}
+
+/* BACKGROUND BUBBLES */
+
+.bubble {
+    position: fixed;
+    bottom: -50px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    animation: bubbleUp 12s linear infinite;
+    pointer-events: none;
+}
+
+.b1 {
+    left: 10%;
+    width: 25px;
+    height: 25px;
+}
+
+.b2 {
+    left: 80%;
+    width: 35px;
+    height: 35px;
+    animation-delay: 3s;
+}
+
+.b3 {
+    left: 45%;
+    width: 20px;
+    height: 20px;
+    animation-delay: 5s;
+}
+
+@keyframes bubbleUp {
+    from {
+        transform: translateY(0);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 0.7;
+    }
+
+    to {
+        transform: translateY(-120vh);
+        opacity: 0;
+    }
+}
+
+/* MAIN CONTAINER */
+
+.container {
+    width: 550px;
+    max-width: 92%;
+    padding: 35px;
+    margin: 30px 0;
+    background: rgba(0, 20, 50, 0.94);
+    border: 2px solid #43dfff;
+    border-radius: 22px;
+    box-shadow: 0 0 30px rgba(0,220,255,0.3);
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.header-icon {
+    font-size: 55px;
+    margin-bottom: 10px;
+}
+
+h1 {
+    color: #72edff;
+    font-size: 28px;
+    margin-bottom: 10px;
+}
+
+.subtitle {
+    color: #c6f4ff;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+/* PLAYER INFORMATION */
+
+.player-name {
+    background: rgba(0, 180, 220, 0.12);
+    border: 1px solid #26c9ed;
+    padding: 12px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    color: #8cecff;
+    font-weight: bold;
+}
+
+/* QUESTION SECTION */
+
+.question-box {
+    background: rgba(255,255,255,0.08);
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid rgba(90,220,255,0.4);
+}
+
+.question-title {
+    font-size: 19px;
+    font-weight: bold;
+    color: #ffffff;
+    margin-bottom: 15px;
+}
+
+.question-image {
+    width: 100%;
+    max-width: 350px;
+    max-height: 300px;
+    object-fit: contain;
+    background: white;
+    border-radius: 10px;
+    padding: 8px;
+    display: block;
+    margin: 0 auto 20px;
+}
+
+.loading {
+    color: #9defff;
+    padding: 25px;
+}
+
+.error {
+    color: #ff8585;
+    font-size: 14px;
+    margin: 12px 0;
+}
+
+/* ANSWER INPUTS */
+
+.answer-section {
+    margin-top: 20px;
+}
+
+.answer-section label {
+    display: block;
+    text-align: left;
+    margin-bottom: 7px;
+    color: #bcefff;
+    font-size: 14px;
+}
+
+.answer-section input {
+    width: 100%;
+    padding: 13px;
+    border-radius: 9px;
+    border: 1px solid #42dfff;
+    background: #eafaff;
+    color: #00304e;
+    font-size: 17px;
+    outline: none;
+    margin-bottom: 15px;
+}
+
+.answer-section input:focus {
+    border: 2px solid #00eaff;
+    box-shadow: 0 0 10px rgba(0,234,255,0.4);
+}
+
+/* BUTTONS */
+
+.btn {
+    width: 100%;
+    padding: 13px;
+    margin-top: 12px;
+    border: none;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #00c9ed, #00e5b5);
+    color: #002b4c;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 15px #00eaff;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* RESULT MESSAGE */
+
+.result-message {
+    display: none;
+    padding: 13px;
+    margin-top: 15px;
+    border-radius: 9px;
+    font-weight: bold;
+    line-height: 1.5;
+}
+
+.correct {
+    display: block;
+    background: rgba(0,220,130,0.15);
+    border: 1px solid #00e5a0;
+    color: #73ffc5;
+}
+
+.wrong {
+    display: block;
+    background: rgba(255,70,90,0.15);
+    border: 1px solid #ff6078;
+    color: #ff9baa;
+}
+
+/* RARE FISH */
+
+.rare-fish {
+    font-size: 65px;
+    margin: 15px;
+}
+
+.footer {
+    color: #8ccfe4;
+    font-size: 12px;
+    margin-top: 20px;
+}
+
+@media(max-width: 500px) {
+
+    .container {
+        padding: 22px;
+    }
+
+    h1 {
+        font-size: 23px;
+    }
+
+    .question-image {
+        max-width: 100%;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- Background bubbles -->
+
+<div class="bubble b1"></div>
+<div class="bubble b2"></div>
+<div class="bubble b3"></div>
+
+<!-- Main API interface -->
+
+<div class="container">
+
+    <div class="header-icon">🐠</div>
+
+    <h1>FISH API CHALLENGE</h1>
+
+    <p class="subtitle">
+        Congratulations! You collected 10 common blue fish.
+        <br>
+        Answer the API challenge to unlock rare fish!
+    </p>
+
+    <div class="player-name">
+        Player: <span id="playerName">Player</span>
+    </div>
+
+    <div class="question-box">
+
+        <div class="question-title">
+            🧩 Answer the Question
+        </div>
+
+        <div id="loadingMessage" class="loading">
+            Loading question from API...
+        </div>
+
+        <img
+            id="questionImage"
+            class="question-image"
+            style="display:none;"
+            alt="Fish API Question"
+        >
+
+        <div id="errorMessage" class="error"></div>
+
+        <div class="answer-section">
+
+            <label for="fishAnswer">
+                🐟 Number of Fish:
+            </label>
+
+            <input
+                type="number"
+                id="fishAnswer"
+                placeholder="Enter number of fish"
+                min="0"
+            >
+
+            <label for="chestAnswer">
+                📦 Number of Treasure Chests:
+            </label>
+
+            <input
+                type="number"
+                id="chestAnswer"
+                placeholder="Enter number of treasure chests"
+                min="0"
+            >
+
+        </div>
+
+        <button
+            class="btn"
+            id="submitButton"
+            onclick="checkAnswer()"
+            disabled
+        >
+            SUBMIT ANSWER
+        </button>
+
+        <div id="resultMessage" class="result-message"></div>
+
+        <button
+            class="btn"
+            id="continueButton"
+            style="display:none;"
+            onclick="continueGame()"
+        >
+            UNLOCK RARE FISH
+        </button>
+
+        <button
+            class="btn"
+            id="retryButton"
+            style="display:none;"
+            onclick="loadQuestion()"
+        >
+            TRY ANOTHER QUESTION
+        </button>
+
+    </div>
+
+    <div class="footer">
+        Fish Collector Game | API Question Interface
+    </div>
+
+</div>
+
+<script>
+
+// =====================================
+// 1. GET PLAYER INFORMATION
+// =====================================
+
+let playerData = JSON.parse(
+    localStorage.getItem("fishCollectorPlayer")
+);
+
+if (!playerData) {
+
+    window.location.href = "index.html";
+
+}
+
+document.getElementById("playerName").textContent =
+    playerData.username;
+
+
+// =====================================
+// 2. API INFORMATION
+// =====================================
+
+const API_URL =
+    "https://marcconrad.com/uob/fish/api.php?out=json";
+
+let correctFish = null;
+let correctChest = null;
+let questionLoaded = false;
+
+
+// =====================================
+// 3. LOAD QUESTION FROM API
+// =====================================
+
+async function loadQuestion() {
+
+    const loadingMessage =
+        document.getElementById("loadingMessage");
+
+    const questionImage =
+        document.getElementById("questionImage");
+
+    const errorMessage =
+        document.getElementById("errorMessage");
+
+    const resultMessage =
+        document.getElementById("resultMessage");
+
+    const submitButton =
+        document.getElementById("submitButton");
+
+    loadingMessage.style.display = "block";
+    loadingMessage.textContent =
+        "Loading question from API...";
+
+    questionImage.style.display = "none";
+
+    errorMessage.textContent = "";
+    resultMessage.style.display = "none";
+
+    document.getElementById("fishAnswer").value = "";
+    document.getElementById("chestAnswer").value = "";
+
+    document.getElementById("continueButton").style.display =
+        "none";
+
+    document.getElementById("retryButton").style.display =
+        "none";
+
+    submitButton.disabled = true;
+
+    questionLoaded = false;
+
+    try {
+
+        const response = await fetch(API_URL, {
+            cache: "no-store"
+        });
+
+        if (!response.ok) {
+            throw new Error("API connection failed.");
+        }
+
+        const data = await response.json();
+
+        // Get question and correct answers
+
+        if (
+            !data.question ||
+            data.fish === undefined ||
+            data.chest === undefined
+        ) {
+            throw new Error("Invalid API response.");
+        }
+
+        correctFish = Number(data.fish);
+        correctChest = Number(data.chest);
+
+        // Display question image
+
+        questionImage.src = data.question;
+
+        questionImage.onload = function() {
+
+            loadingMessage.style.display = "none";
+            questionImage.style.display = "block";
+
+            submitButton.disabled = false;
+
+            questionLoaded = true;
+
+        };
+
+        questionImage.onerror = function() {
+
+            throw new Error("Could not load question image.");
+
+        };
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        loadingMessage.style.display = "none";
+
+        errorMessage.textContent =
+            "Unable to load the question. Please try again.";
+
+        document.getElementById("retryButton").style.display =
+            "block";
+
+    }
+
+}
+
+
+// =====================================
+// 4. CHECK PLAYER ANSWER
+// =====================================
+
+function checkAnswer() {
+
+    if (!questionLoaded) {
+        return;
+    }
+
+    const fishInput =
+        document.getElementById("fishAnswer").value.trim();
+
+    const chestInput =
+        document.getElementById("chestAnswer").value.trim();
+
+    const resultMessage =
+        document.getElementById("resultMessage");
+
+    // Validate empty inputs
+
+    if (fishInput === "" || chestInput === "") {
+
+        resultMessage.className =
+            "result-message wrong";
+
+        resultMessage.textContent =
+            "Please enter both answers.";
+
+        return;
+
+    }
+
+    const playerFishAnswer = Number(fishInput);
+    const playerChestAnswer = Number(chestInput);
+
+    // Compare answers with API solutions
+
+    if (
+        playerFishAnswer === correctFish &&
+        playerChestAnswer === correctChest
+    ) {
+
+        // Correct answer
+
+        resultMessage.className =
+            "result-message correct";
+
+        resultMessage.innerHTML =
+            "🎉 Correct Answer!<br>" +
+            "You successfully completed the API challenge!";
+
+        document.getElementById("submitButton").disabled =
+            true;
+
+        document.getElementById("fishAnswer").disabled =
+            true;
+
+        document.getElementById("chestAnswer").disabled =
+            true;
+
+        document.getElementById("continueButton").style.display =
+            "block";
+
+    }
+
+    else {
+
+        // Wrong answer
+
+        resultMessage.className =
+            "result-message wrong";
+
+        resultMessage.textContent =
+            "❌ Incorrect Answer! Please try again.";
+
+    }
+
+}
+
+
+// =====================================
+// 5. UNLOCK RARE FISH
+// =====================================
+
+function continueGame() {
+
+    // Unlock rare fish
+
+    playerData.rareUnlocked = true;
+
+    // Save player information
+
+    localStorage.setItem(
+        "fishCollectorPlayer",
+        JSON.stringify(playerData)
+    );
+
+    // Return to game
+
+    window.location.href = "game.html";
+
+}
+
+
+// =====================================
+// 6. START API QUESTION
+// =====================================
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,227 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fish Collector - Main Menu</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #001f4d, #006994, #00b4d8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+}
+
+.menu-container {
+    width: 90%;
+    max-width: 420px;
+    padding: 30px;
+    text-align: center;
+    background: rgba(0, 20, 60, 0.85);
+    border: 3px solid #55dfff;
+    border-radius: 20px;
+    box-shadow: 0 0 25px #00d9ff;
+}
+
+h1 {
+    font-size: 35px;
+    margin-bottom: 10px;
+    color: #7df9ff;
+}
+
+.player-name {
+    margin-bottom: 25px;
+    font-size: 17px;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.menu-btn {
+    width: 100%;
+    padding: 17px;
+    border: none;
+    border-radius: 12px;
+    background: #00bfff;
+    color: white;
+    font-size: 21px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.menu-btn:hover {
+    background: #008cff;
+    transform: scale(1.05);
+}
+
+.section {
+    display: none;
+    margin-top: 25px;
+    padding: 20px;
+    background: rgba(0, 100, 150, 0.6);
+    border-radius: 12px;
+}
+
+.section h2 {
+    margin-bottom: 15px;
+    color: #7df9ff;
+}
+
+.section button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #00bfff;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.section button:hover {
+    background: #008cff;
+}
+
+.back-btn {
+    background: #ff9800 !important;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="menu-container">
+
+    <h1>🐠 FISH COLLECTOR</h1>
+
+    <p class="player-name" id="playerName">
+        Welcome, Player!
+    </p>
+
+    <!-- Main Menu Buttons -->
+    <div class="menu-buttons">
+
+        <button class="menu-btn" onclick="showSection('loginSection')">
+            LOGIN
+        </button>
+
+        <button class="menu-btn" onclick="showSection('levelsSection')">
+            LEVELS
+        </button>
+
+        <button class="menu-btn" onclick="showSection('scoreSection')">
+            SCORE
+        </button>
+
+    </div>
+
+    <!-- Login Section -->
+    <div class="section" id="loginSection">
+        <h2>LOGIN</h2>
+        <p>Return to the login page to start a new game.</p>
+
+        <button onclick="goToLogin()">Go to Login</button>
+        <button class="back-btn" onclick="backToMenu()">Back to Menu</button>
+    </div>
+
+    <!-- Levels Section -->
+    <div class="section" id="levelsSection">
+        <h2>SELECT LEVEL</h2>
+
+        <button onclick="startLevel(1)">LEVEL 1</button>
+
+        <button id="level2Button" onclick="startLevel(2)">
+            LEVEL 2 🔒
+        </button>
+
+        <button class="back-btn" onclick="backToMenu()">Back to Menu</button>
+    </div>
+
+    <!-- Score Section -->
+    <div class="section" id="scoreSection">
+        <h2>YOUR SCORE</h2>
+
+        <p style="font-size: 28px; margin: 15px;">
+            ⭐ <span id="finalScore">0</span>
+        </p>
+
+        <p>Total collected points</p>
+
+        <button class="back-btn" onclick="backToMenu()">Back to Menu</button>
+    </div>
+
+</div>
+
+<script>
+
+const playerData = JSON.parse(
+    localStorage.getItem("fishCollectorPlayer")
+);
+
+if (playerData) {
+    document.getElementById("playerName").textContent =
+        "Welcome, " + playerData.username + "!";
+    
+    document.getElementById("finalScore").textContent =
+        playerData.score || 0;
+
+    if (playerData.rareUnlocked) {
+        document.getElementById("level2Button").textContent =
+            "LEVEL 2";
+    }
+}
+
+function showSection(sectionId) {
+
+    document.querySelectorAll(".section").forEach(section => {
+        section.style.display = "none";
+    });
+
+    document.getElementById(sectionId).style.display = "block";
+}
+
+function backToMenu() {
+
+    document.querySelectorAll(".section").forEach(section => {
+        section.style.display = "none";
+    });
+}
+
+function goToLogin() {
+    window.location.href = "index.html";
+}
+
+function startLevel(level) {
+
+    if (level === 2 && (!playerData || !playerData.rareUnlocked)) {
+        alert("Complete Level 1 and the API question to unlock Level 2!");
+        return;
+    }
+
+    localStorage.setItem("selectedLevel", level);
+    window.location.href = "game.html";
+}
+
+</script>
+
+</body>
+</html>
