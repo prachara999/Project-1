@@ -1,0 +1,14 @@
+# Protect player account information
+ForestGuardian/data/players.json
+ForestGuardianNew/data/players.json
+
+# Ignore local databases
+*.sqlite
+*.db
+
+# Ignore environment secrets
+.env
+.env.*
+
+# Ignore dependencies
+node_modules/

@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fish Collector - Game</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #001b38;
+    color: white;
+    overflow: hidden;
+}
+
+/* MAIN GAME */
+
+.game-container {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    background:
+        linear-gradient(rgba(0,35,75,0.2), rgba(0,15,45,0.5)),
+        linear-gradient(180deg, #003c69, #006c91 65%, #00304e);
+    overflow: hidden;
+}
+
+/* UNDERWATER LIGHT EFFECT */
+
+.game-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+        repeating-linear-gradient(
+            110deg,
+            transparent 0px,
+            transparent 100px,
+            rgba(100,220,255,0.06) 130px,
+            transparent 170px
+        );
+    animation: waterLight 8s linear infinite;
+    pointer-events: none;
+}
+
+@keyframes waterLight {
+    from { transform: translateX(-100px); }
+    to { transform: translateX(100px); }
+}
+
+/* BACKGROUND BUBBLES */
+
+.bubble {
+    position: absolute;
+    bottom: -50px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-radius: 50%;
+    animation: bubbleUp 12s linear infinite;
+    pointer-events: none;
+}
+
+.b1 { left: 10%; width: 20px; height: 20px; }
+.b2 { left: 30%; width: 35px; height: 35px; animation-delay: 3s; }
+.b3 { left: 65%; width: 18px; height: 18px; animation-delay: 5s; }
+.b4 { left: 85%; width: 30px; height: 30px; animation-delay: 2s; }
+.b5 { left: 50%; width: 25px; height: 25px; animation-delay: 7s; }
+
+@keyframes bubbleUp {
+    from { transform: translateY(0); opacity: 0; }
+    20% { opacity: 0.7; }
+    to { transform: translateY(-120vh); opacity: 0; }
+}
+
+/* SEA FLOOR */
+
+.sea-floor {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 65px;
+    background: linear-gradient(#087c89, #064e62);
+    border-top: 3px solid rgba(75,220,220,0.3);
+}
+
+/* SEA PLANTS */
+
+.plant {
+    position: absolute;
+    bottom: 48px;
+    font-size: 45px;
+    opacity: 0.8;
+    pointer-events: none;
+}
+
+.plant1 { left: 3%; }
+.plant2 { left: 17%; font-size: 35px; }
+.plant3 { right: 10%; }
+.plant4 { right: 25%; font-size: 38px; }
+
+/* TOP PLAYER INFORMATION */
+
+.top-bar {
+    position: absolute;
+    z-index: 5;
+    top: 15px;
+    left: 2%;
+    width: 96%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.player-info,
+.game-stats {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(0,20,45,0.85);
+    border: 1px solid #39c9ed;
+    border-radius: 14px;
+    padding: 12px 20px;
+    box-shadow: 0 0 12px rgba(0,220,255,0.15);
+}
+
+.player-info {
+    min-width: 230px;
+}
+
+.player-avatar {
+    width: 52px;
+    height: 42px;
+}
+
+.player-name {
+    font-size: 17px;
+    font-weight: bold;
+    color: #73eaff;
+}
+
+.level-text {
+    font-size: 12px;
+    margin-top: 5px;
+    color: #b8eaff;
+}
+
+.game-stats {
+    gap: 28px;
+}
+
+.stat {
+    text-align: center;
+    min-width: 65px;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #b6eaff;
+    margin-bottom: 5px;
+}
+
+.stat-value {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+}
+
+.hearts {
+    color: #ff557b;
+    font-size: 22px;
+    letter-spacing: 2px;
+}
+
+/* GAME INSTRUCTIONS */
+
+.instructions {
+    position: absolute;
+    z-index: 5;
+    top: 110px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,25,55,0.7);
+    border: 1px solid rgba(90,220,255,0.5);
+    border-radius: 10px;
+    padding: 9px 20px;
+    color: #c7f7ff;
+    font-size: 13px;
+    text-align: center;
+}
+
+/* GAME AREA */
+
+.game-area {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+}
+
+/* PLAYER FISH */
+
+.player {
+    position: absolute;
+    width: 95px;
+    height: 75px;
+    left: 15%;
+    top: 48%;
+    z-index: 4;
+    transition: filter 0.15s;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+    pointer-events: none;
+}
+
+.player svg {
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+/* COMMON FISH */
+
+.fish-object {
+    position: absolute;
+    width: 65px;
+    height: 50px;
+    z-index: 3;
+    cursor: default;
+    filter: drop-shadow(0 0 7px rgba(0,200,255,0.5));
+}
+
+.fish-object svg {
+    width: 100%;
+    height: 100%;
+}
+
+.fish-object.bonus {
+    width: 75px;
+    height: 65px;
+    filter: drop-shadow(0 0 12px #ffe78a);
+}
+
+/* SHARK */
+
+.shark {
+    position: absolute;
+    z-index: 3;
+    font-size: 65px;
+    width: 85px;
+    height: 75px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    filter: drop-shadow(0 0 10px rgba(255,80,80,0.6));
+}
+
+/* MOVEMENT CONTROLS */
+
+.controls {
+    position: absolute;
+    z-index: 6;
+    bottom: 85px;
+    right: 35px;
+    width: 150px;
+    height: 125px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 7px;
+}
+
+.control-btn {
+    border: 1px solid #65eaff;
+    border-radius: 10px;
+    background: rgba(0,30,65,0.85);
+    color: white;
+    font-size: 22px;
+    cursor: pointer;
+    transition: 0.15s;
+    touch-action: none;
+    user-select: none;
+}
+
+.control-btn:hover,
+.control-btn.active {
+    background: #00aaca;
+    box-shadow: 0 0 12px #00eaff;
+}
+
+.up { grid-column: 2; grid-row: 1; }
+.left { grid-column: 1; grid-row: 2; }
+.down { grid-column: 2; grid-row: 2; }
+.right { grid-column: 3; grid-row: 2; }
+
+/* CONTROL LABEL */
+
+.move-label {
+    position: absolute;
+    bottom: 220px;
+    right: 35px;
+    width: 150px;
+    text-align: center;
+    color: #b8efff;
+    font-size: 13px;
+}
+
+/* GAME MESSAGE */
+
+.game-message {
+    position: absolute;
+    z-index: 5;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #bdf7ff;
+    font-size: 14px;
+    text-align: center;
+}
+
+/* OVERLAY */
+
+.overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0,10,30,0.8);
+    backdrop-filter: blur(5px);
+}
+
+.modal {
+    width: 420px;
+    max-width: 90%;
+    padding: 35px;
+    text-align: center;
+    background: linear-gradient(145deg, #003c65, #001e43);
+    border: 2px solid #56e5ff;
+    border-radius: 22px;
+    box-shadow: 0 0 30px rgba(0,220,255,0.35);
+}
+
+.modal h2 {
+    color: #72edff;
+    font-size: 28px;
+    margin-bottom: 20px;
+}
+
+.modal p {
+    color: #d5f5ff;
+    line-height: 1.8;
+    margin: 12px 0;
+}
+
+.modal-fish {
+    font-size: 75px;
+    margin: 15px;
+}
+
+.modal-btn {
+    width: 100%;
+    padding: 13px;
+    margin-top: 20px;
+    background: linear-gradient(90deg, #00c9ed, #00e5b5);
+    color: #002b4c;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-btn:hover {
+    box-shadow: 0 0 18px #00eaff;
+    transform: scale(1.02);
+}
+
+/* SCORE SCREEN */
+
+.score-row {
+    display: flex;
+    justify-content: space-between;
+    margin: 18px 0;
+    padding: 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.08);
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 750px) {
+    .top-bar {
+        flex-wrap: wrap;
+    }
+
+    .player-info,
+    .game-stats {
+        padding: 8px;
+        gap: 8px;
+    }
+
+    .stat {
+        min-width: 45px;
+    }
+
+    .controls {
+        right: 10px;
+        bottom: 75px;
+    }
+
+    .instructions {
+        top: 125px;
+        width: 90%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="game-container" id="gameContainer">
+
+    <!-- Background bubbles -->
+
+    <div class="bubble b1"></div>
+    <div class="bubble b2"></div>
+    <div class="bubble b3"></div>
+    <div class="bubble b4"></div>
+    <div class="bubble b5"></div>
+
+    <!-- Sea plants -->
+
+    <div class="plant plant1">🌿</div>
+    <div class="plant plant2">🪸</div>
+    <div class="plant plant3">🌿</div>
+    <div class="plant plant4">🪸</div>
+
+    <!-- Top player information -->
+
+    <div class="top-bar">
+
+        <div class="player-info">
+
+            <div class="player-avatar" id="topAvatar"></div>
+
+            <div>
+                <div class="player-name" id="playerName">
+                    Player
+                </div>
+
+                <div class="level-text">
+                    Level: <span id="level">1</span>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="game-stats">
+
+            <div class="stat">
+                <div class="stat-label">SCORE</div>
+                <div class="stat-value" id="score">0</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">LIVES</div>
+                <div class="hearts" id="lives">♥ ♥ ♥</div>
+            </div>
+
+            <div class="stat">
+                <div class="stat-label">BLUE FISH</div>
+                <div class="stat-value" id="fishCount">0/10</div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Instructions -->
+
+    <div class="instructions">
+        🐟 Collect 10 Blue Fish | 🦈 Avoid Sharks!
+        <br>
+        Use Arrow Keys or the buttons to move your fish.
+    </div>
+
+    <!-- Main game area -->
+
+    <div class="game-area" id="gameArea">
+
+        <!-- Player fish -->
+
+        <div class="player" id="playerFish"></div>
+
+    </div>
+
+    <!-- Sea floor -->
+
+    <div class="sea-floor"></div>
+
+    <!-- Movement buttons -->
+
+    <div class="move-label">MOVE YOUR FISH</div>
+
+    <div class="controls">
+
+        <button class="control-btn up" data-dir="up">▲</button>
+
+        <button class="control-btn left" data-dir="left">◀</button>
+
+        <button class="control-btn down" data-dir="down">▼</button>
+
+        <button class="control-btn right" data-dir="right">▶</button>
+
+    </div>
+
+    <div class="game-message" id="gameMessage">
+        Explore the ocean and collect blue fish!
+    </div>
+
+    <!-- 10 Blue Fish Collected Modal -->
+
+    <div class="overlay" id="successOverlay">
+
+        <div class="modal">
+
+            <h2>🎉 Fish Collected!</h2>
+
+            <div class="modal-fish">🐟</div>
+
+            <p>
+                Successfully collected 10 common blue fish!
+            </p>
+
+            <p>
+                <strong>Blue Fish (Common)</strong>
+                <br>
+                +10 points per fish
+            </p>
+
+            <button class="modal-btn" onclick="continueToAPI()">
+                OK
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Game Over Modal -->
+
+    <div class="overlay" id="gameOverOverlay">
+
+        <div class="modal">
+
+            <h2>💔 GAME OVER</h2>
+
+            <div class="modal-fish">🦈</div>
+
+            <p>You ran out of lives!</p>
+
+            <p id="gameOverText">
+                Better luck next time!
+            </p>
+
+            <button class="modal-btn" onclick="showFinalScore()">
+                VIEW FINAL SCORE
+            </button>
+
+        </div>
+
+    </div>
+
+    <!-- Final Score Screen -->
+
+    <div class="overlay" id="scoreOverlay">
+
+        <div class="modal">
+
+            <h2>🏆 FINAL SCORE</h2>
+
+            <p>Great effort, <span id="finalName"></span>!</p>
+
+            <div class="score-row">
+                <span>Total Score</span>
+                <strong id="finalScore">0</strong>
+            </div>
+
+            <div class="score-row">
+                <span>Blue Fish Collected</span>
+                <strong id="finalFish">0</strong>
+            </div>
+
+            <div class="score-row">
+                <span>Remaining Lives</span>
+                <strong id="finalLives">0</strong>
+            </div>
+
+            <button class="modal-btn" onclick="playAgain()">
+                PLAY AGAIN
+            </button>
+
+            <button class="modal-btn" onclick="backToMenu()">
+                BACK TO MENU
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+// =====================================
+// 1. GET PLAYER INFORMATION FROM LOGIN
+// =====================================
+
+let playerData = JSON.parse(
+    localStorage.getItem("fishCollectorPlayer")
+);
+
+if (!playerData) {
+    window.location.href = "index.html";
+}
+
+let username = playerData.username;
+let avatarColor = playerData.avatarColor || "#159bff";
+
+let score = Number(playerData.score || 0);
+let blueFish = Number(playerData.blueFish || 0);
+let lives = Number(playerData.lives ?? 3);
+
+let rareUnlocked = playerData.rareUnlocked || false;
+
+let gameRunning = true;
+let successShown = false;
+let gameOver = false;
+
+const gameArea = document.getElementById("gameArea");
+const playerFish = document.getElementById("playerFish");
+
+let playerX = 15;
+let playerY = 48;
+
+const keys = {
+    up: false,
+    down: false,
+    left: false,
+    right: false
+};
+
+let objects = [];
+let lastSpawn = 0;
+let lastTime = 0;
+let objectId = 0;
+
+/* Reduced player movement speed */
+const speed = 0.12;
+
+// =====================================
+// 2. FISH SVG DESIGN
+// =====================================
+
+function createFishSVG(color) {
+
+    return `
+    <svg viewBox="0 0 120 90">
+
+        <path d="M25 45 L5 25 L5 65 Z"
+              fill="${color}"/>
+
+        <ellipse cx="62" cy="45"
+                 rx="40" ry="27"
+                 fill="${color}"/>
+
+        <path d="M50 20 Q60 2 75 20"
+              fill="${color}"/>
+
+        <path d="M50 70 Q65 85 78 69"
+              fill="${color}"/>
+
+        <circle cx="88" cy="37" r="5"
+                fill="white"/>
+
+        <circle cx="90" cy="37" r="2.5"
+                fill="#111"/>
+
+        <path d="M92 53 Q103 58 108 50"
+              stroke="#00334d"
+              stroke-width="2"
+              fill="none"/>
+
+    </svg>`;
+}
+
+// =====================================
+// 3. DISPLAY PLAYER DETAILS
+// =====================================
+
+document.getElementById("playerName").textContent =
+    username;
+
+document.getElementById("topAvatar").innerHTML =
+    createFishSVG(avatarColor);
+
+playerFish.innerHTML = createFishSVG(avatarColor);
+
+function updateDisplay() {
+
+    document.getElementById("score").textContent =
+        score;
+
+    document.getElementById("fishCount").textContent =
+        blueFish + "/10";
+
+    document.getElementById("lives").textContent =
+        "♥ ".repeat(lives) + "♡ ".repeat(3 - lives);
+
+    document.getElementById("level").textContent =
+        rareUnlocked ? 2 : 1;
+}
+
+// =====================================
+// 4. SAVE GAME INFORMATION
+// =====================================
+
+function savePlayerData() {
+
+    playerData.username = username;
+    playerData.avatarColor = avatarColor;
+    playerData.score = score;
+    playerData.blueFish = blueFish;
+    playerData.lives = lives;
+    playerData.rareUnlocked = rareUnlocked;
+
+    localStorage.setItem(
+        "fishCollectorPlayer",
+        JSON.stringify(playerData)
+    );
+}
+
+// =====================================
+// 5. PLAYER MOVEMENT
+// =====================================
+
+function movePlayer(delta) {
+
+    if (!gameRunning) return;
+
+    const distance = speed * delta;
+
+    if (keys.up) playerY -= distance;
+    if (keys.down) playerY += distance;
+    if (keys.left) playerX -= distance;
+    if (keys.right) playerX += distance;
+
+    const maxX = (gameArea.clientWidth - playerFish.offsetWidth)
+                 / gameArea.clientWidth * 100;
+
+    const maxY = (gameArea.clientHeight - playerFish.offsetHeight)
+                 / gameArea.clientHeight * 100;
+
+    playerX = Math.max(0, Math.min(maxX, playerX));
+    playerY = Math.max(0, Math.min(maxY, playerY));
+
+    playerFish.style.left = playerX + "%";
+    playerFish.style.top = playerY + "%";
+}
+
+// Keyboard controls
+
+document.addEventListener("keydown", function(event) {
+
+    const direction = {
+        ArrowUp: "up",
+        ArrowDown: "down",
+        ArrowLeft: "left",
+        ArrowRight: "right"
+    }[event.key];
+
+    if (direction) {
+        event.preventDefault();
+        keys[direction] = true;
+    }
+
+});
+
+document.addEventListener("keyup", function(event) {
+
+    const direction = {
+        ArrowUp: "up",
+        ArrowDown: "down",
+        ArrowLeft: "left",
+        ArrowRight: "right"
+    }[event.key];
+
+    if (direction) {
+        keys[direction] = false;
+    }
+
+});
+
+// On-screen movement buttons
+
+document.querySelectorAll(".control-btn").forEach(button => {
+
+    const direction = button.dataset.dir;
+
+    button.addEventListener("pointerdown", function(event) {
+        event.preventDefault();
+
+        keys[direction] = true;
+        button.classList.add("active");
+    });
+
+    function stopMovement() {
+        keys[direction] = false;
+        button.classList.remove("active");
+    }
+
+    button.addEventListener("pointerup", stopMovement);
+    button.addEventListener("pointerleave", stopMovement);
+    button.addEventListener("pointercancel", stopMovement);
+
+});
+
+// Stop moving when browser loses focus
+
+window.addEventListener("blur", function() {
+    Object.keys(keys).forEach(key => keys[key] = false);
+});
+
+// =====================================
+// 6. CREATE COMMON BLUE FISH
+// =====================================
+
+function createCommonFish() {
+
+    const fish = document.createElement("div");
+
+    fish.className = "fish-object";
+    fish.innerHTML = createFishSVG("#159bff");
+
+    /* Start from the left side */
+    fish.style.left =
+        -80 + "px";
+
+    fish.style.top =
+        (70 + Math.random() *
+        (gameArea.clientHeight - 190)) + "px";
+
+    fish.dataset.type = "common";
+    fish.dataset.id = ++objectId;
+
+    gameArea.appendChild(fish);
+
+    objects.push({
+        element: fish,
+        type: "common",
+        x: -80,
+        y: parseFloat(fish.style.top),
+        speed: 0.04 + Math.random() * 0.07
+    });
+
+}
+
+// =====================================
+// 7. CREATE RARE FISH
+// =====================================
+
+function createRareFish() {
+
+    const rare = document.createElement("div");
+
+    rare.className = "fish-object bonus";
+
+    rare.innerHTML = `
+        <svg viewBox="0 0 100 90">
+            <path d="M25 45 L5 25 L5 65 Z"
+                  fill="#ffbd38"/>
+
+            <ellipse cx="55" cy="45"
+                     rx="36" ry="27"
+                     fill="#ffbd38"/>
+
+            <path d="M35 23 Q45 -3 65 20"
+                  fill="#ffbd38"/>
+
+            <circle cx="78" cy="36" r="5"
+                    fill="white"/>
+
+            <circle cx="80" cy="36" r="2.5"
+                    fill="#111"/>
+
+            <circle cx="43" cy="37" r="4"
+                    fill="#fff1a5"/>
+
+            <circle cx="55" cy="54" r="5"
+                    fill="#fff1a5"/>
+        </svg>
+    `;
+
+    /* Start from the left side */
+    rare.style.left =
+        -90 + "px";
+
+    rare.style.top =
+        (70 + Math.random() *
+        (gameArea.clientHeight - 190)) + "px";
+
+    gameArea.appendChild(rare);
+
+    objects.push({
+        element: rare,
+        type: "rare",
+        x: -90,
+        y: parseFloat(rare.style.top),
+        speed: 0.05 + Math.random() * 0.07
+    });
+
+}
+
+// =====================================
+// 8. CREATE SHARK OBSTACLE
+// =====================================
+
+function createShark() {
+
+    const shark = document.createElement("div");
+
+    shark.className = "shark";
+    shark.textContent = "🦈";
+
+    /* Start from the left side */
+    shark.style.left =
+        -100 + "px";
+
+    shark.style.top =
+        (70 + Math.random() *
+        (gameArea.clientHeight - 190)) + "px";
+
+    gameArea.appendChild(shark);
+
+    objects.push({
+        element: shark,
+        type: "shark",
+        x: -100,
+        y: parseFloat(shark.style.top),
+        speed: 0.10 + Math.random() * 0.06
+    });
+
+}
+
+// =====================================
+// 9. COLLISION DETECTION
+// =====================================
+
+function checkCollision(a, b) {
+
+    const rectA = a.getBoundingClientRect();
+    const rectB = b.getBoundingClientRect();
+
+    return (
+        rectA.left < rectB.right - 8 &&
+        rectA.right > rectB.left + 8 &&
+        rectA.top < rectB.bottom - 8 &&
+        rectA.bottom > rectB.top + 8
+    );
+}
+
+// =====================================
+// 10. COLLECT FISH
+// =====================================
+
+function collectFish(object, index) {
+
+    if (object.type === "common") {
+
+        blueFish++;
+        score += 10;
+
+        document.getElementById("gameMessage").textContent =
+            "🐟 Common Blue Fish Collected! +10 Points";
+
+    }
+
+    else if (object.type === "rare") {
+
+        score += 50;
+
+        document.getElementById("gameMessage").textContent =
+            "⭐ Rare Fish Collected! +50 Bonus Points";
+
+    }
+
+    object.element.remove();
+    objects.splice(index, 1);
+
+    updateDisplay();
+    savePlayerData();
+
+    // Successfully collect 10 common fish
+
+    if (blueFish >= 10 && !successShown && !rareUnlocked) {
+
+        successShown = true;
+        gameRunning = false;
+
+        document.getElementById("successOverlay").style.display =
+            "flex";
+    }
+
+}
+
+// =====================================
+// 11. SHARK COLLISION
+// =====================================
+
+function hitShark(object, index) {
+
+    lives--;
+
+    object.element.remove();
+    objects.splice(index, 1);
+
+    updateDisplay();
+    savePlayerData();
+
+    playerFish.style.filter =
+        "drop-shadow(0 0 18px red)";
+
+    setTimeout(() => {
+        playerFish.style.filter =
+            "drop-shadow(0 0 10px white)";
+    }, 350);
+
+    document.getElementById("gameMessage").textContent =
+        "⚠️ Shark Attack! You lost one life!";
+
+    if (lives <= 0) {
+        endGame();
+    }
+
+}
+
+// =====================================
+// 12. GAME OVER
+// =====================================
+
+function endGame() {
+
+    gameRunning = false;
+    gameOver = true;
+
+    savePlayerData();
+
+    document.getElementById("gameOverText").textContent =
+        "You collected " + blueFish +
+        " / 10 common blue fish.";
+
+    document.getElementById("gameOverOverlay").style.display =
+        "flex";
+
+}
+
+// =====================================
+// 13. SUCCESS - MOVE TO API
+// =====================================
+
+function continueToAPI() {
+
+    gameRunning = false;
+
+    savePlayerData();
+
+    // The API question interface will be created
+    // in Step 3 as api.html.
+
+    window.location.href = "api.html";
+
+}
+
+// =====================================
+// 14. FINAL SCORE SCREEN
+// =====================================
+
+function showFinalScore() {
+
+    document.getElementById("gameOverOverlay").style.display =
+        "none";
+
+    document.getElementById("scoreOverlay").style.display =
+        "flex";
+
+    document.getElementById("finalName").textContent =
+        username;
+
+    document.getElementById("finalScore").textContent =
+        score;
+
+    document.getElementById("finalFish").textContent =
+        blueFish;
+
+    document.getElementById("finalLives").textContent =
+        lives;
+
+}
+
+// =====================================
+// 15. PLAY AGAIN
+// =====================================
+
+function playAgain() {
+
+    localStorage.setItem(
+        "fishCollectorPlayer",
+        JSON.stringify({
+            username: username,
+            avatarName: playerData.avatarName,
+            avatarColor: avatarColor,
+            score: 0,
+            lives: 3,
+            blueFish: 0,
+            rareUnlocked: false
+        })
+    );
+
+    window.location.href = "game.html";
+
+}
+
+// =====================================
+// 16. BACK TO LOGIN
+// =====================================
+
+function backToMenu() {
+
+    window.location.href = "index.html";
+
+}
+
+// =====================================
+// 17. MAIN GAME LOOP
+// =====================================
+
+function gameLoop(timestamp) {
+
+    if (!gameRunning) return;
+
+    const delta = Math.min(timestamp - (lastTime || timestamp), 40);
+
+    lastTime = timestamp;
+
+    // Move player
+    movePlayer(delta);
+
+    // Spawn objects
+
+    if (timestamp - lastSpawn > 1300) {
+
+        if (rareUnlocked) {
+
+            const chance = Math.random();
+
+            if (chance < 0.25) {
+                createRareFish();
+            }
+            else if (chance < 0.50) {
+                createShark();
+            }
+            else {
+                createCommonFish();
+            }
+
+        } else {
+
+            if (Math.random() < 0.25) {
+                createShark();
+            } else {
+                createCommonFish();
+            }
+
+        }
+
+        lastSpawn = timestamp;
+    }
+
+    // Move objects and check collisions
+
+    for (let i = objects.length - 1; i >= 0; i--) {
+
+        const object = objects[i];
+
+        /* Move objects from left to right */
+        object.x += object.speed * delta;
+
+        object.element.style.left =
+            object.x + "px";
+
+        // Remove objects outside screen
+
+        if (object.x > gameArea.clientWidth + 120) {
+
+            object.element.remove();
+            objects.splice(i, 1);
+            continue;
+
+        }
+
+        // Collision with player
+
+        if (checkCollision(playerFish, object.element)) {
+
+            if (object.type === "shark") {
+                hitShark(object, i);
+            } else {
+                collectFish(object, i);
+            }
+
+            if (!gameRunning) return;
+
+        }
+
+    }
+
+    requestAnimationFrame(gameLoop);
+
+}
+
+// =====================================
+// 18. START GAME
+// =====================================
+
+updateDisplay();
+
+playerFish.style.left = playerX + "%";
+playerFish.style.top = playerY + "%";
+
+// Continue after API challenge if rare fish unlocked
+
+if (rareUnlocked) {
+    document.getElementById("gameMessage").textContent =
+        "⭐ Rare fish unlocked! Collect bonus fish!";
+}
+
+if (lives <= 0) {
+    endGame();
+} else if (blueFish >= 10 && !rareUnlocked) {
+
+    successShown = true;
+    gameRunning = false;
+
+    document.getElementById("successOverlay").style.display =
+        "flex";
+
+} else {
+
+    requestAnimationFrame(gameLoop);
+
+}
+function backToMenu() {
+
+    // Save the player's final score and game details
+    savePlayerData();
+ 
+    // Open the main menu interface
+    window.location.href = "mainmenu.html";
+}
+</script>
+
+</body>
+</html>erData.blueFish = blueFish;
+    playerData.lives = lives;
+    playerData.rareUnlocked = rareUnlocked;
+
+    localStorage.setItem(
+        "fishCollectorPlayer",
+        JSON.stringify(playerData)
+    );
+
+
+// =====================================
+// 5. PLAYER MOVEMENT
+// =====================================
+
+function movePlayer(delta) {
+
+    if (!gameRunning) return;
+
+    const distance = speed * delta;
+
+    if (keys.up) playerY -= distance;
+    if (keys.down) playerY += distance;
+    if (keys.left) playerX -= distance;
+    if (keys.right) playerX += distance;
+
+    const maxX = (gameArea.clientWidth - playerFish.offsetWidth)
+                 / gameArea.clientWidth * 100;
+
+    const maxY = (gameArea.clientHeight - playerFish.offsetHeight)
+                 / gameArea.clientHeight * 100;
+
+    playerX = Math.max(0, Math.min(maxX, playerX));
+    playerY = Math.max(0, Math.min(maxY, playerY));
+
+    playerFish.style.left = playerX + "%";
+    playerFish.style.top = playerY + "%";
+}
+
+// Keyboard controls
+
+document.addEventListener("keydown", function(event) {
+
+    const direction = {
+        ArrowUp: "up",
+        ArrowDown: "down",
+        ArrowLeft: "left",
+        ArrowRight: "right"
+    }[event.key];
+
+    if (direction) {
+        event.preventDefault();
+        keys[direction] = true;
+    }
+
+});
+
+document.addEventListener("keyup", function(event) {
+
+    const direction = {
+        ArrowUp: "up",
+        ArrowDown: "down",
+        ArrowLeft: "left",
+        ArrowRight: "right"
+    }[event.key];
+
+    if (direction) {
+        keys[direction] = false;
+    }
+
+});
+
+// On-screen movement buttons
+
+document.querySelectorAll(".control-btn").forEach(button => {
+
+    const direction = button.dataset.dir;
+
+    button.addEventListener("pointerdown", function(event) {
+        event.preventDefault();
+
+        keys[direction] = true;
+        button.classList.add("active");
+    });
+
+    function stopMovement() {
+        keys[direction] = false;
+        button.classList.remove("active");
+    }
+
+    button.addEventListener("pointerup", stopMovement);
+    button.addEventListener("pointerleave", stopMovement);
+    button.addEventListener("pointercancel", stopMovement);
+
+});
+
+// Stop moving when browser loses focus
+
+window.addEventListener("blur", function() {
+    Object.keys(keys).forEach(key => keys[key] = false);
+});
+
+// =====================================
+// 6. CREATE COMMON BLUE FISH
+// =====================================
+
+function createCommonFish() {
+
+    const fish = document.createElement("div");
+
+    fish.className = "fish-object";
+    fish.innerHTML = createFishSVG("#159bff");
+
+    fish.style.left =
+        (gameArea.clientWidth - 80) + "px";
+
+    fish.style.top =
+        (70 + Math.random() *
+        (gameArea.clientHeight - 190)) + "px";
+
+    fish.dataset.type = "common";
+    fish.dataset.id = ++objectId;
+
+    gameArea.appendChild(fish);
+
+    objects.push({
+        element: fish,
+        type: "common",
+        x: gameArea.clientWidth - 80,
+        y: parseFloat(fish.style.top),
+        speed: 0.04 + Math.random() * 0.07
+    });
+
+}
+
+// =====================================
+// 7. CREATE RARE FISH
+// =====================================
+
+function createRareFish() {
+
+    const rare = document.createElement("div");
+
+    rare.className = "fish-object bonus";
+
+    rare.innerHTML = `
+        <svg viewBox="0 0 100 90">
+            <path d="M25 45 L5 25 L5 65 Z"
+                  fill="#ffbd38"/>
+
+            <ellipse cx="55" cy="45"
+                     rx="36" ry="27"
+                     fill="#ffbd38"/>
+
+            <path d="M35 23 Q45 -3 65 20"
+                  fill="#ffbd38"/>
+
+            <circle cx="78" cy="36" r="5"
+                    fill="white"/>
+
+            <circle cx="80" cy="36" r="2.5"
+                    fill="#111"/>
+
+            <circle cx="43" cy="37" r="4"
+                    fill="#fff1a5"/>
+
+            <circle cx="55" cy="54" r="5"
+                    fill="#fff1a5"/>
+        </svg>
+    `;
+
+    rare.style.left =
+        (gameArea.clientWidth - 90) + "px";
+
+    rare.style.top =
+        (70 + Math.random() *
+        (gameArea.clientHeight - 190)) + "px";
+
+    gameArea.appendChild(rare);
+
+    objects.push({
+        element: rare,
+        type: "rare",
+        x: gameArea.clientWidth - 90,
+        y: parseFloat(rare.style.top),
+        speed: 0.05 + Math.random() * 0.07
+    });
+
+}
+
+// =====================================
+// 8. CREATE SHARK OBSTACLE
+// =====================================
+
+function createShark() {
+
+    const shark = document.createElement("div");
+
+    shark.className = "shark";
+    shark.textContent = "🦈";
+
+    shark.style.left =
+        (gameArea.clientWidth - 100) + "px";
+
+    shark.style.top =
+        (70 + Math.random() *
+        (gameArea.clientHeight - 190)) + "px";
+
+    gameArea.appendChild(shark);
+
+    objects.push({
+        element: shark,
+        type: "shark",
+        x: gameArea.clientWidth - 100,
+        y: parseFloat(shark.style.top),
+        speed: 0.10 + Math.random() * 0.06
+    });
+
+}
+
+// =====================================
+// 9. COLLISION DETECTION
+// =====================================
+
+function checkCollision(a, b) {
+
+    const rectA = a.getBoundingClientRect();
+    const rectB = b.getBoundingClientRect();
+
+    return (
+        rectA.left < rectB.right - 8 &&
+        rectA.right > rectB.left + 8 &&
+        rectA.top < rectB.bottom - 8 &&
+        rectA.bottom > rectB.top + 8
+    );
+}
+
+// =====================================
+// 10. COLLECT FISH
+// =====================================
+
+function collectFish(object, index) {
+
+    if (object.type === "common") {
+
+        blueFish++;
+        score += 10;
+
+        document.getElementById("gameMessage").textContent =
+            "🐟 Common Blue Fish Collected! +10 Points";
+
+    }
+
+    else if (object.type === "rare") {
+
+        score += 50;
+
+        document.getElementById("gameMessage").textContent =
+            "⭐ Rare Fish Collected! +50 Bonus Points";
+
+    }
+
+    object.element.remove();
+    objects.splice(index, 1);
+
+    updateDisplay();
+    savePlayerData();
+
+    // Successfully collect 10 common fish
+
+    if (blueFish >= 10 && !successShown && !rareUnlocked) {
+
+        successShown = true;
+        gameRunning = false;
+
+        document.getElementById("successOverlay").style.display =
+            "flex";
+    }
+
+}
+
+// =====================================
+// 11. SHARK COLLISION
+// =====================================
+
+function hitShark(object, index) {
+
+    lives--;
+
+    object.element.remove();
+    objects.splice(index, 1);
+
+    updateDisplay();
+    savePlayerData();
+
+    playerFish.style.filter =
+        "drop-shadow(0 0 18px red)";
+
+    setTimeout(() => {
+        playerFish.style.filter =
+            "drop-shadow(0 0 10px white)";
+    }, 350);
+
+    document.getElementById("gameMessage").textContent =
+        "⚠️ Shark Attack! You lost one life!";
+
+    if (lives <= 0) {
+        endGame();
+    }
+
+}
+
+// =====================================
+// 12. GAME OVER
+// =====================================
+
+function endGame() {
+
+    gameRunning = false;
+    gameOver = true;
+
+    savePlayerData();
+
+    document.getElementById("gameOverText").textContent =
+        "You collected " + blueFish +
+        " / 10 common blue fish.";
+
+    document.getElementById("gameOverOverlay").style.display =
+        "flex";
+
+}
+
+// =====================================
+// 13. SUCCESS - MOVE TO API
+// =====================================
+
+function continueToAPI() {
+
+    gameRunning = false;
+
+    savePlayerData();
+
+    // The API question interface will be created
+    // in Step 3 as api.html.
+
+    window.location.href = "api.html";
+
+}
+
+// =====================================
+// 14. FINAL SCORE SCREEN
+// =====================================
+
+function showFinalScore() {
+
+    document.getElementById("gameOverOverlay").style.display =
+        "none";
+
+    document.getElementById("scoreOverlay").style.display =
+        "flex";
+
+    document.getElementById("finalName").textContent =
+        username;
+
+    document.getElementById("finalScore").textContent =
+        score;
+
+    document.getElementById("finalFish").textContent =
+        blueFish;
+
+    document.getElementById("finalLives").textContent =
+        lives;
+
+}
+
+// =====================================
+// 15. PLAY AGAIN
+// =====================================
+
+function playAgain() {
+
+    localStorage.setItem(
+        "fishCollectorPlayer",
+        JSON.stringify({
+            username: username,
+            avatarName: playerData.avatarName,
+            avatarColor: avatarColor,
+            score: 0,
+            lives: 3,
+            blueFish: 0,
+            rareUnlocked: false
+        })
+    );
+
+    window.location.href = "game.html";
+
+}
+
+// =====================================
+// 16. BACK TO LOGIN
+// =====================================
+
+function backToMenu() {
+
+    // Save the player's final score and game details
+    savePlayerData();
+
+    // Open the main menu interface
+    window.location.href = "mainmenu.html";
+}
+
+// =====================================
+// 17. MAIN GAME LOOP
+// =====================================
+
+function gameLoop(timestamp) {
+
+    if (!gameRunning) return;
+
+    const delta = Math.min(timestamp - (lastTime || timestamp), 40);
+
+    lastTime = timestamp;
+
+    // Move player
+    movePlayer(delta);
+
+    // Spawn objects
+
+    if (timestamp - lastSpawn > 1300) {
+
+        if (rareUnlocked) {
+
+            const chance = Math.random();
+
+            if (chance < 0.25) {
+                createRareFish();
+            }
+            else if (chance < 0.50) {
+                createShark();
+            }
+            else {
+                createCommonFish();
+            }
+
+        } else {
+
+            if (Math.random() < 0.25) {
+                createShark();
+            } else {
+                createCommonFish();
+            }
+
+        }
+
+        lastSpawn = timestamp;
+    }
+
+    // Move objects and check collisions
+
+    for (let i = objects.length - 1; i >= 0; i--) {
+
+        const object = objects[i];
+
+        object.x -= object.speed * delta;
+
+        object.element.style.left =
+            object.x + "px";
+
+        // Remove objects outside screen
+
+        if (object.x < -120) {
+
+            object.element.remove();
+            objects.splice(i, 1);
+            continue;
+
+        }
+
+        // Collision with player
+
+        if (checkCollision(playerFish, object.element)) {
+
+            if (object.type === "shark") {
+                hitShark(object, i);
+            } else {
+                collectFish(object, i);
+            }
+
+            if (!gameRunning) return;
+
+        }
+
+    }
+
+    requestAnimationFrame(gameLoop);
+
+}
+
+// =====================================
+// 18. START GAME
+// =====================================
+
+updateDisplay();
+
+playerFish.style.left = playerX + "%";
+playerFish.style.top = playerY + "%";
+
+// Continue after API challenge if rare fish unlocked
+
+if (rareUnlocked) {
+    document.getElementById("gameMessage").textContent =
+        "⭐ Rare fish unlocked! Collect bonus fish!";
+}
+
+if (lives <= 0) {
+    endGame();
+} else if (blueFish >= 10 && !rareUnlocked) {
+
+    successShown = true;
+    gameRunning = false;
+
+    document.getElementById("successOverlay").style.display =
+        "flex";
+
+} else {
+
+    requestAnimationFrame(gameLoop);
+
+}
+
+
+
+</script>
+
+</body>
+</html>

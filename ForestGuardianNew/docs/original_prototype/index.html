@@ -1,0 +1,514 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fish Collector - Login</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(
+        180deg,
+        #001b3d 0%,
+        #004b75 55%,
+        #0086a8 100%
+    );
+    color: white;
+}
+
+/* Underwater background */
+
+.ocean {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* Bubbles */
+
+.bubble {
+    position: absolute;
+    bottom: -100px;
+    width: 20px;
+    height: 20px;
+    border: 2px solid rgba(255,255,255,0.5);
+    border-radius: 50%;
+    animation: rise 10s infinite ease-in;
+}
+
+.bubble:nth-child(1) {
+    left: 10%;
+    animation-delay: 0s;
+}
+
+.bubble:nth-child(2) {
+    left: 25%;
+    width: 30px;
+    height: 30px;
+    animation-delay: 3s;
+}
+
+.bubble:nth-child(3) {
+    left: 75%;
+    animation-delay: 2s;
+}
+
+.bubble:nth-child(4) {
+    left: 90%;
+    width: 35px;
+    height: 35px;
+    animation-delay: 5s;
+}
+
+.bubble:nth-child(5) {
+    left: 55%;
+    animation-delay: 6s;
+}
+
+@keyframes rise {
+    0% {
+        transform: translateY(0);
+        opacity: 0;
+    }
+    20% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-110vh);
+        opacity: 0;
+    }
+}
+
+/* Login container */
+
+.login-container {
+    position: relative;
+    z-index: 2;
+    width: 620px;
+    max-width: 92%;
+    padding: 35px 40px;
+    text-align: center;
+    background: rgba(0, 20, 55, 0.82);
+    border: 2px solid rgba(105, 225, 255, 0.7);
+    border-radius: 25px;
+    box-shadow: 0 0 35px rgba(0, 210, 255, 0.35);
+}
+
+h1 {
+    font-size: 42px;
+    letter-spacing: 5px;
+    color: #65e8ff;
+    text-shadow: 0 0 15px #00cfff;
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #c6f5ff;
+    margin-bottom: 28px;
+    font-size: 15px;
+}
+
+/* Username */
+
+.input-title {
+    display: block;
+    text-align: left;
+    font-size: 17px;
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.username-input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: 2px solid #4bdfff;
+    background: rgba(255,255,255,0.95);
+    font-size: 16px;
+    outline: none;
+    margin-bottom: 25px;
+}
+
+.username-input:focus {
+    box-shadow: 0 0 12px #00d9ff;
+}
+
+/* Avatar section */
+
+.avatar-heading {
+    font-size: 19px;
+    margin-bottom: 18px;
+    color: #ffffff;
+}
+
+.avatar-list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 13px;
+}
+
+.avatar-card {
+    padding: 12px 5px;
+    background: rgba(255,255,255,0.09);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 15px;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.avatar-card:hover {
+    background: rgba(0, 205, 255, 0.2);
+    transform: translateY(-5px);
+}
+
+.avatar-card.selected {
+    border: 3px solid #5dffda;
+    background: rgba(0, 220, 190, 0.22);
+    box-shadow: 0 0 18px #00e5d0;
+    transform: translateY(-5px);
+}
+
+/* Fish avatar design */
+
+.fish {
+    width: 95px;
+    max-width: 100%;
+    height: 75px;
+    display: block;
+    margin: auto;
+}
+
+.avatar-name {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+    color: white;
+    font-weight: bold;
+}
+
+/* Selected avatar preview */
+
+.selected-info {
+    margin-top: 20px;
+    padding: 12px;
+    color: #aaf5ff;
+    font-size: 14px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 10px;
+}
+
+/* Start button */
+
+.start-btn {
+    width: 100%;
+    margin-top: 25px;
+    padding: 15px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #00c9e8, #00e6b8);
+    color: #002c4b;
+    font-size: 19px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.start-btn:hover {
+    transform: scale(1.03);
+    box-shadow: 0 0 20px #00eaff;
+}
+
+.message {
+    color: #ffb6b6;
+    margin-top: 12px;
+    font-size: 14px;
+    min-height: 18px;
+}
+
+/* Responsive layout */
+
+@media (max-width: 600px) {
+    body {
+        overflow-y: auto;
+    }
+
+    .ocean {
+        padding: 20px 0;
+    }
+
+    .login-container {
+        padding: 25px 18px;
+    }
+
+    h1 {
+        font-size: 30px;
+    }
+
+    .avatar-list {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="ocean">
+
+    <!-- Background bubbles -->
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+
+    <div class="login-container">
+
+        <h1>🐠 FISH COLLECTOR</h1>
+
+        <p class="subtitle">
+            Explore the underwater world and collect fishes!
+        </p>
+
+        <!-- Username -->
+        <label class="input-title" for="username">
+            Enter your username:
+        </label>
+
+        <input
+            type="text"
+            id="username"
+            class="username-input"
+            placeholder="Enter your name..."
+            maxlength="20"
+        >
+
+        <!-- Avatar selection -->
+        <h3 class="avatar-heading">
+            Choose Your Avatar:
+        </h3>
+
+        <div class="avatar-list">
+
+            <!-- Blue Fish -->
+            <div class="avatar-card selected"
+                 data-color="#159bff"
+                 data-name="Blue Fish"
+                 onclick="selectAvatar(this)">
+
+                <svg class="fish" viewBox="0 0 120 90">
+                    <path d="M25 45 L5 25 L5 65 Z"
+                          fill="#159bff"/>
+                    <ellipse cx="62" cy="45"
+                             rx="40" ry="27"
+                             fill="#159bff"/>
+                    <path d="M50 20 Q60 2 75 20"
+                          fill="#159bff"/>
+                    <path d="M50 70 Q65 85 78 69"
+                          fill="#159bff"/>
+                    <circle cx="88" cy="37" r="5"
+                            fill="white"/>
+                    <circle cx="90" cy="37" r="2.5"
+                            fill="#111"/>
+                    <path d="M92 53 Q103 58 108 50"
+                          stroke="#00334d"
+                          stroke-width="2"
+                          fill="none"/>
+                </svg>
+
+                <span class="avatar-name">Blue Fish</span>
+            </div>
+
+            <!-- Orange Fish -->
+            <div class="avatar-card"
+                 data-color="#ff9635"
+                 data-name="Orange Fish"
+                 onclick="selectAvatar(this)">
+
+                <svg class="fish" viewBox="0 0 120 90">
+                    <path d="M25 45 L5 25 L5 65 Z"
+                          fill="#ff9635"/>
+                    <ellipse cx="62" cy="45"
+                             rx="40" ry="27"
+                             fill="#ff9635"/>
+                    <path d="M50 20 Q60 2 75 20"
+                          fill="#ff9635"/>
+                    <path d="M50 70 Q65 85 78 69"
+                          fill="#ff9635"/>
+                    <circle cx="88" cy="37" r="5"
+                            fill="white"/>
+                    <circle cx="90" cy="37" r="2.5"
+                            fill="#111"/>
+                    <path d="M92 53 Q103 58 108 50"
+                          stroke="#663000"
+                          stroke-width="2"
+                          fill="none"/>
+                </svg>
+
+                <span class="avatar-name">Orange Fish</span>
+            </div>
+
+            <!-- Purple Fish -->
+            <div class="avatar-card"
+                 data-color="#bd72ff"
+                 data-name="Purple Fish"
+                 onclick="selectAvatar(this)">
+
+                <svg class="fish" viewBox="0 0 120 90">
+                    <path d="M25 45 L5 25 L5 65 Z"
+                          fill="#bd72ff"/>
+                    <ellipse cx="62" cy="45"
+                             rx="40" ry="27"
+                             fill="#bd72ff"/>
+                    <path d="M50 20 Q60 2 75 20"
+                          fill="#bd72ff"/>
+                    <path d="M50 70 Q65 85 78 69"
+                          fill="#bd72ff"/>
+                    <circle cx="88" cy="37" r="5"
+                            fill="white"/>
+                    <circle cx="90" cy="37" r="2.5"
+                            fill="#111"/>
+                    <path d="M92 53 Q103 58 108 50"
+                          stroke="#4c176e"
+                          stroke-width="2"
+                          fill="none"/>
+                </svg>
+
+                <span class="avatar-name">Purple Fish</span>
+            </div>
+
+            <!-- Green Fish -->
+            <div class="avatar-card"
+                 data-color="#36d68b"
+                 data-name="Green Fish"
+                 onclick="selectAvatar(this)">
+
+                <svg class="fish" viewBox="0 0 120 90">
+                    <path d="M25 45 L5 25 L5 65 Z"
+                          fill="#36d68b"/>
+                    <ellipse cx="62" cy="45"
+                             rx="40" ry="27"
+                             fill="#36d68b"/>
+                    <path d="M50 20 Q60 2 75 20"
+                          fill="#36d68b"/>
+                    <path d="M50 70 Q65 85 78 69"
+                          fill="#36d68b"/>
+                    <circle cx="88" cy="37" r="5"
+                            fill="white"/>
+                    <circle cx="90" cy="37" r="2.5"
+                            fill="#111"/>
+                    <path d="M92 53 Q103 58 108 50"
+                          stroke="#075c37"
+                          stroke-width="2"
+                          fill="none"/>
+                </svg>
+
+                <span class="avatar-name">Green Fish</span>
+            </div>
+
+        </div>
+
+        <!-- Selected avatar information -->
+        <div class="selected-info" id="selectedInfo">
+            Selected Avatar: Blue Fish
+        </div>
+
+        <!-- Start button -->
+        <button class="start-btn" onclick="startGame()">
+            START GAME ▶
+        </button>
+
+        <p class="message" id="message"></p>
+
+    </div>
+</div>
+
+<script>
+
+// Default avatar
+let selectedAvatar = {
+    name: "Blue Fish",
+    color: "#159bff"
+};
+
+// Select avatar function
+function selectAvatar(card) {
+
+    // Remove previous selection
+    document.querySelectorAll(".avatar-card")
+        .forEach(item => {
+            item.classList.remove("selected");
+        });
+
+    // Highlight selected avatar
+    card.classList.add("selected");
+
+    // Save selected avatar details
+    selectedAvatar = {
+        name: card.dataset.name,
+        color: card.dataset.color
+    };
+
+    // Update preview text
+    document.getElementById("selectedInfo").textContent =
+        "Selected Avatar: " + selectedAvatar.name;
+}
+
+// Start game function
+function startGame() {
+
+    const username =
+        document.getElementById("username").value.trim();
+
+    const message =
+        document.getElementById("message");
+
+    // Check username
+    if (username === "") {
+        message.textContent =
+            "Please enter your username!";
+        document.getElementById("username").focus();
+        return;
+    }
+
+    // Player information
+    const player = {
+        username: username,
+        avatarName: selectedAvatar.name,
+        avatarColor: selectedAvatar.color,
+        score: 0,
+        lives: 3,
+        blueFish: 0
+    };
+
+    // Save player information
+    localStorage.setItem(
+        "fishCollectorPlayer",
+        JSON.stringify(player)
+    );
+
+    // Go to the game interface
+    window.location.href = "game.html";
+
+    
+    
+}
+
+</script>
+
+</body>
+</html>
